@@ -40,24 +40,24 @@ with st.sidebar:
     )
 
     output_format = st.radio(
-        "Formato di Output",
-        ["Plain Text", "Markdown Strutturato", "JSON"]
+        "Output format",
+        ["Plain Text", "Markdown", "JSON"]
     )
 
-uploaded_file = st.file_uploader("Carica un'immagine o un documento (PNG, JPG, WEBP)", type=["png", "jpg", "jpeg", "webp"])
+uploaded_file = st.file_uploader("Load an image (PNG, JPG, WEBP)", type=["png", "jpg", "jpeg", "webp"])
 
 if uploaded_file:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Immagine Caricata")
+        st.subheader("Image uploaded")
         st.image(uploaded_file, use_container_width=True)
 
     with col2:
-        st.subheader("Risultato Trascrizione")
+        st.subheader("Result")
 
-        if st.button("Esegui Trascrizione", type="primary"):
-            with st.spinner("Analisi visiva dell'immagine in corso..."):
+        if st.button("Elaborate image", type="primary"):
+            with st.spinner("Visual analysis in progress..."):
                 base64_img = encode_image(uploaded_file)
                 mime_type = uploaded_file.type
 
@@ -86,7 +86,7 @@ if uploaded_file:
                     )
 
                     extracted_text = response.choices[0].message.content
-                    st.success("Trascrizione completata!")
+                    st.success("Done!")
 
                     if output_format == "JSON":
                         st.code(extracted_text, language="json")
@@ -94,7 +94,7 @@ if uploaded_file:
                         st.markdown(extracted_text)
 
                     st.download_button(
-                        label="Scarica Trascrizione(.txt)",
+                        label="Save(.txt)",
                         data=extracted_text,
                         file_name="transcription.txt",
                         mime="text/plain"
