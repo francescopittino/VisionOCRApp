@@ -7,9 +7,7 @@ Simple App that uses LLM Vision models from Openrouter to extract readable text 
 
 ## Run with: 
 
-'''shell
-streamlit run main.py
-'''
+*streamlit run main.py*
 
 ## Usage:
 
