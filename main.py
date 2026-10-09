@@ -101,4 +101,4 @@ if uploaded_file:
                     )
 
                 except Exception as e:
-                    st.error(f"Errore durante l'elaborazione: {e}")
+                    st.error(f"Error: {e}")
