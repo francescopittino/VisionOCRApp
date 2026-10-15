@@ -61,8 +61,23 @@ if uploaded_file:
                 base64_img = encode_image(uploaded_file)
                 mime_type = uploaded_file.type
 
-                system_prompt = "You are an advanced OCR system. Given an image that contains text, return a transcription of it. If parts of the text are not readable/are ambiguous, mark them as such and do not try to guess."
-                user_prompt = f"Give an accurate transcription. For the output, use the {output_format} format. Output only the transcription, nothing else."
+                #Currently using Role-Prompting (zero-shot to limit token usage)
+                system_prompt = """You are an OCR (Optical Character Recognition) system. 
+                    Your sole task is to transcribe readable text from images.
+                    
+                    FOLLOW THESE RULES:
+                    1. *Fidelity*: Transcribe the text exactly as it appears. Do not fix spelling mistakes, grammar errors, or typos present in the original image.
+                    2. *Layout Preservation*: Maintain the original structure, paragraphs, line breaks, and indentation as much as possible. If there are tables or lists, preserve their formatting.
+                    3. *Ambiguity Handling*: If a character, word, or section is illegible, blurry, or ambiguous, represent it explicitly using the marker [unreadable] or [illegible]. Never try to guess missing or unreadable text.
+                    4. *No Conversational Filler*: Do not add introductory text, explanations, or conclusions. Return exclusively the extracted text content.
+                    """
+                
+                if output_format == "JSON":
+                    user_prompt = "Transcribe the text in this image and output it strictly as a valid JSON object with meaningful keys representing the document's structure"
+                elif output_format == "Markdown":
+                    user_prompt = "Transcribe the text preserving structural elements like headers, lists, and tables using Markdown syntax"
+                else:
+                    user_prompt = "Give an accurate plain text transcription maintaining paragraph breaks"
 
                 try:
                     response = client.chat.completions.create(
@@ -82,7 +97,7 @@ if uploaded_file:
                                 ]
                             }
                         ],
-                        temperature=0.2
+                        temperature=0.2 #low temp to reduce hallucinations, might want to lower it further
                     )
 
                     extracted_text = response.choices[0].message.content
@@ -96,7 +111,7 @@ if uploaded_file:
                     st.download_button(
                         label="Save(.txt)",
                         data=extracted_text,
-                        file_name="transcription.txt",
+                        file_name="transcription.txt", #To add: json and markdown
                         mime="text/plain"
                     )
 
